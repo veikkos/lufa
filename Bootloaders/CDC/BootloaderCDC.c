@@ -95,6 +95,16 @@ void Application_Jump_Check(void)
 
 		/* Re-enable JTAG debugging */
 		JTAG_ENABLE();
+	#elif (BOARD == BOARD_VEIKKO_BOARD)
+		/* Enable pull-up on the button pin so we can use it to select the mode */
+		PORTB |= (1 << 7);
+		Delay_MS(10);
+
+		/* If the button is pressed, start the bootloader */
+		JumpToApplication = ((PINB & (1 << 7)) != 0);
+
+		/* Disable pull-up after the check has completed */
+		PORTB &= ~(1 << 7);
 	#else
 		/* Check if the device's BOOTRST fuse is set */
 		if (!(BootloaderAPI_ReadFuse(GET_HIGH_FUSE_BITS) & ~FUSE_BOOTRST))
